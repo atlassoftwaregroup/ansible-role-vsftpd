@@ -1,0 +1,55 @@
+---
+# tasks file for jnakatsui.wordpress
+- name: Installing packages
+  apt:
+    pkg={{ item }}
+    state=present
+  with_items:
+    - vsftpd
+
+- name: Configure vsftpd.conf
+  template:
+    src={{ vsftpd_config_template if vsftpd_config_template else 'vsftpd.conf.j2' }}
+    dest=/etc/vsftpd.conf
+    owner=root
+    group=root
+    mode=0644
+  notify: restart vsftpd
+- name: Configure vsftpd.user_list
+  template:
+    src={{ 'vsftpd.user_list.j2' }}
+    dest=/etc/vsftpd.user_list
+    owner=root
+    group=root
+    mode=0644
+  notify: restart vsftpd
+- name: Configure vsftpd.chroot_list
+  template:
+    src={{ 'vsftpd.chroot_list.j2' }}
+    dest=/etc/vsftpd.chroot_list
+    owner=root
+    group=root
+    mode=0644
+  notify: restart vsftpd
+
+- name: Adding nologin shell
+  lineinfile:
+    state=present
+    dest=/etc/shells
+    line="/usr/sbin/nologin"
+    regexp="^/usr/sbin/nologin"
+    insertafter=EOF
+
+- name: Configuring service
+  service:
+    name=vsftpd
+    state={{ vsftpd_service_state }}
+    enabled={{ vsftpd_service_enabled }}
+
+- name: Adding users
+  user:
+    name={{ item.username }}
+    comment={{ item.username|default(item.username) }}
+    password={{ item.password }}
+    shell=/usr/sbin/nologin
+  with_items: vsftpd_users
