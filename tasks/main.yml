@@ -6,7 +6,6 @@
     state=present
   with_items:
     - vsftpd
-
 - name: Configure vsftpd.conf
   template:
     src={{ vsftpd_config_template if vsftpd_config_template else 'vsftpd.conf.j2' }}
