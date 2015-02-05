@@ -3,10 +3,6 @@ Role Name
 
 vsftpd role heavily inspired by franklinkim.vsftpd
 
-for some reason must use sudo passwd to change the password to authenticate.
-
-Under development please do not use
-
 Requirements
 ------------
 
