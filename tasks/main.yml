@@ -52,5 +52,5 @@
 - name: set permissions for cytosportftp home folder
   file:
     path: "/home/{{ item.username }}"
-    mode: 500
+    mode: 0500
   with_items: vsftpd_users
