@@ -6,7 +6,6 @@
     state=present
   with_items:
     - vsftpd
-
 - name: Configure vsftpd.conf
   template:
     src={{ vsftpd_config_template if vsftpd_config_template else 'vsftpd.conf.j2' }}
@@ -31,7 +30,6 @@
     group=root
     mode=0644
   notify: restart vsftpd
-
 - name: Adding nologin shell
   lineinfile:
     state=present
@@ -39,17 +37,20 @@
     line="/usr/sbin/nologin"
     regexp="^/usr/sbin/nologin"
     insertafter=EOF
-
 - name: Configuring service
   service:
     name=vsftpd
     state={{ vsftpd_service_state }}
     enabled={{ vsftpd_service_enabled }}
-
 - name: Adding users
   user:
     name: "{{ item.username }}"
     comment: "{{ item.username|default(item.username) }}"
     password: "{{ item.password }}"
     shell: "/usr/sbin/nologin"
+  with_items: vsftpd_users
+- name: set permissions for cytosportftp home folder
+  file:
+    path: "/home/{{ item.username }}"
+    mode: 500
   with_items: vsftpd_users
